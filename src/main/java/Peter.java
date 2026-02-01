@@ -12,7 +12,7 @@ public class Peter {
     }
 
     public static void main(String[] args) {
-        List<String> list = new ArrayList<>();
+        List<Task> list = new ArrayList<>();
         String menu = " Hello! I'm " + name + "\n" +
                 " What can I do for you?\n";
         printOutput(menu);
@@ -29,7 +29,7 @@ public class Peter {
                     continue;
                 }
 
-                String listStr = "";
+                String listStr = "Here are the tasks in your list: \n";
                 for (int i = 0; i < list.size(); i++) {
                     listStr += i + 1 + "." + list.get(i);
                     if (i != list.size() - 1) {
@@ -37,8 +37,36 @@ public class Peter {
                     }
                 }
                 printOutput(listStr);
+            } else if (userInput.startsWith("mark") || userInput.startsWith("unmark")) {
+                // then mark the right item
+                String[] splitStr = userInput.split(" ");
+                String invalidMsg = "Invalid index. Item does not exist in list.";
+
+                try {
+                    int markIndex = Integer.parseInt(splitStr[1]) - 1;
+
+                    if (markIndex < 0 || markIndex >= list.size()) {
+                        printOutput(invalidMsg);
+                        continue;
+                    }
+
+                    Task task = list.get(markIndex);
+
+                    if (userInput.startsWith("mark")) {
+                        task.markAsDone();
+                        printOutput("Keep it up! I've marked this task as done: \n" +
+                                task);
+                    } else {
+                        task.markAsUndone();
+                        printOutput("Got it. I've marked this task as not done yet: \n" +
+                                task);
+                    }
+                } catch (Exception e) {
+                    printOutput(invalidMsg);
+                }
+
             } else {
-                list.add(userInput);
+                list.add(new Task(userInput));
                 printOutput(">> Added: " + userInput);
             }
         }
