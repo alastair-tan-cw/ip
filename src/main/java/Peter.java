@@ -103,6 +103,27 @@ public class Peter {
         }
     }
 
+    public static void deleteTask(String userInput, List<Task> list) throws PeterException {
+        String[] splitStr = userInput.split(" ");
+
+        int delIndex;
+
+        try {
+            delIndex = Integer.parseInt(splitStr[1]) - 1;
+        } catch (NumberFormatException e) {
+            throw new PeterException("Index must be a number.");
+        }
+
+        if (delIndex < 0 || delIndex >= list.size()) {
+            throw new PeterException("Invalid index. Item does not exist in list.");
+        }
+
+        Task task = list.remove(delIndex);
+        printOutput("Noted. I've removed this task:\n" +
+                task +
+                "\nNow you have " + list.size() + " tasks in your list.");
+    }
+
     public static void main(String[] args) {
         List<Task> list = new ArrayList<>();
         String menu = " Hello! I'm " + name + "\n" +
@@ -136,7 +157,9 @@ public class Peter {
             }
 
             try {
-                if (userInput.startsWith("mark") || userInput.startsWith("unmark")) {
+                if (userInput.startsWith("delete")) {
+                    deleteTask(userInput, list);
+                } else if (userInput.startsWith("mark") || userInput.startsWith("unmark")) {
                     markTask(userInput, list);
                 } else if (userInput.startsWith("todo") || userInput.startsWith("deadline") || userInput.startsWith("event")) {
                     addTask(userInput, list);
