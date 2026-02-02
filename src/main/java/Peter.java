@@ -8,13 +8,13 @@ public class Peter {
     public static void printOutput (String input) {
         System.out.println("____________________________________________________________\n" +
                 input +
-                "\n____________________________________________________________\n");
+                "\n____________________________________________________________");
     }
 
     public static void main(String[] args) {
         List<Task> list = new ArrayList<>();
         String menu = " Hello! I'm " + name + "\n" +
-                " What can I do for you?\n";
+                " What can I do for you?";
         printOutput(menu);
 
         Scanner sc = new Scanner(System.in);
@@ -29,7 +29,7 @@ public class Peter {
                     continue;
                 }
 
-                String listStr = "Here are the tasks in your list: \n";
+                String listStr = "Here are the tasks in your list:\n";
                 for (int i = 0; i < list.size(); i++) {
                     listStr += i + 1 + "." + list.get(i);
                     if (i != list.size() - 1) {
@@ -54,11 +54,11 @@ public class Peter {
 
                     if (userInput.startsWith("mark")) {
                         task.markAsDone();
-                        printOutput("Keep it up! I've marked this task as done: \n" +
+                        printOutput("Keep it up! I've marked this task as done:\n" +
                                 task);
                     } else {
                         task.markAsUndone();
-                        printOutput("Got it. I've marked this task as not done yet: \n" +
+                        printOutput("Got it. I've marked this task as not done yet:\n" +
                                 task);
                     }
                 } catch (Exception e) {
@@ -68,7 +68,7 @@ public class Peter {
                 userInput = userInput.substring(5);
                 Task todo = new Todo(userInput);
                 list.add(todo);
-                printOutput(">> Got it! I've added this task: \n" +
+                printOutput(">> Got it! I've added this task:\n" +
                         todo +
                         "\nNow you have " + list.size() + " tasks in your list.");
 
@@ -83,7 +83,7 @@ public class Peter {
                 String[] inputArr = userInput.split(" /by ");
                 Task deadline = new Deadline(inputArr[0], inputArr[1]);
                 list.add(deadline);
-                printOutput(">> Got it! I've added this task: \n" +
+                printOutput(">> Got it! I've added this task:\n" +
                         deadline +
                         "\nNow you have " + list.size() + " tasks in your list.");
 
@@ -105,7 +105,7 @@ public class Peter {
 
                 Task event = new Event(description, start, end);
                 list.add(event);
-                printOutput(">> Got it! I've added this task: \n" +
+                printOutput(">> Got it! I've added this task:\n" +
                         event +
                         "\nNow you have " + list.size() + " tasks in your list.");
 
