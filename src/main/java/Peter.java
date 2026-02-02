@@ -65,6 +65,10 @@ public class Peter {
                     printOutput(invalidMsg);
                 }
             } else if (userInput.startsWith("todo")) {
+                if (userInput.length() <= 5) {
+                    printOutput("Sorry! Description of todo cannot be empty.");
+                    continue;
+                }
                 userInput = userInput.substring(5);
                 Task todo = new Todo(userInput);
                 list.add(todo);
@@ -73,6 +77,10 @@ public class Peter {
                         "\nNow you have " + list.size() + " tasks in your list.");
 
             } else if (userInput.startsWith("deadline")) {
+                if (userInput.length() <= 9) {
+                    printOutput("Sorry! Description of deadline cannot be empty.");
+                    continue;
+                }
                 userInput = userInput.substring(9);
 
                 if (!userInput.contains(" /by ")) {
@@ -88,6 +96,11 @@ public class Peter {
                         "\nNow you have " + list.size() + " tasks in your list.");
 
             } else if (userInput.startsWith("event")) {
+                if (userInput.length() <= 6) {
+                    printOutput("Sorry! Description of event cannot be empty.");
+                    continue;
+                }
+
                 userInput = userInput.substring(6);
 
                 if (!userInput.contains(" /from ") || !userInput.contains(" /to ")) {
@@ -110,8 +123,8 @@ public class Peter {
                         "\nNow you have " + list.size() + " tasks in your list.");
 
             } else {
-                list.add(new Task(userInput));
-                printOutput(">> Added: " + userInput);
+                printOutput("Sorry, I do not know what that means. Would you like to add\n" +
+                        "a task using 'todo', 'deadline' or 'event'?");
             }
         }
     }
