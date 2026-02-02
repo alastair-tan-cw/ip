@@ -11,6 +11,98 @@ public class Peter {
                 "\n____________________________________________________________");
     }
 
+    public static void addTask(String userInput, List<Task> list) throws PeterException {
+        if (userInput.startsWith("todo")) {
+            if (userInput.length() <= 5) {
+                throw new PeterException("Sorry! Description of todo cannot be empty.");
+            }
+
+            userInput = userInput.substring(5);
+            Task todo = new Todo(userInput);
+            list.add(todo);
+            printOutput(">> Got it! I've added this task:\n" +
+                    todo +
+                    "\nNow you have " + list.size() + " tasks in your list.");
+
+        }
+
+        if (userInput.startsWith("deadline")) {
+            if (userInput.length() <= 9) {
+                throw new PeterException("Sorry! Description of deadline cannot be empty.");
+            }
+
+            userInput = userInput.substring(9);
+
+            if (!userInput.contains(" /by ")) {
+                throw new PeterException("Incorrect format. Should be deadline <task> /by <time>");
+            }
+
+            String[] inputArr = userInput.split(" /by ");
+            Task deadline = new Deadline(inputArr[0], inputArr[1]);
+            list.add(deadline);
+            printOutput(">> Got it! I've added this task:\n" +
+                    deadline +
+                    "\nNow you have " + list.size() + " tasks in your list.");
+        }
+
+        if (userInput.startsWith("event")) {
+            if (userInput.length() <= 6) {
+                throw new PeterException("Sorry! Description of event cannot be empty.");
+            }
+
+            userInput = userInput.substring(6);
+
+            if (!userInput.contains(" /from ") || !userInput.contains(" /to ")) {
+                throw new PeterException("Incorrect format. Should be event <task> /from <time> /to <time>");
+            }
+
+            // read book /from 12 June /to 14 June
+            String[] inputArr = userInput.split(" /from ");
+            String description = inputArr[0];
+
+            String[] dateArr = inputArr[1].split(" /to ");
+            String start = dateArr[0];
+            String end = dateArr[1];
+
+            Task event = new Event(description, start, end);
+            list.add(event);
+            printOutput(">> Got it! I've added this task:\n" +
+                    event +
+                    "\nNow you have " + list.size() + " tasks in your list.");
+        }
+    }
+
+    public static void markTask(String userInput, List<Task> list) throws PeterException {
+        if (userInput.startsWith("mark") || userInput.startsWith("unmark")) {
+            // then mark the right item
+            String[] splitStr = userInput.split(" ");
+
+            int markIndex;
+
+            try {
+                markIndex = Integer.parseInt(splitStr[1]) - 1;
+            } catch (NumberFormatException e) {
+                throw new PeterException("Index must be a number.");
+            }
+
+            if (markIndex < 0 || markIndex >= list.size()) {
+                throw new PeterException("Invalid index. Item does not exist in list.");
+            }
+
+            Task task = list.get(markIndex);
+
+            if (userInput.startsWith("mark")) {
+                task.markAsDone();
+                printOutput("Keep it up! I've marked this task as done:\n" +
+                        task);
+            } else {
+                task.markAsUndone();
+                printOutput("Got it. I've marked this task as not done yet:\n" +
+                        task);
+            }
+        }
+    }
+
     public static void main(String[] args) {
         List<Task> list = new ArrayList<>();
         String menu = " Hello! I'm " + name + "\n" +
@@ -20,10 +112,13 @@ public class Peter {
         Scanner sc = new Scanner(System.in);
         while (true) {
             String userInput = sc.nextLine();
+
             if (userInput.equals("bye")) {
                 printOutput("Goodbye. Chat again soon?");
                 break;
-            } else if (userInput.equals("list")) {
+            }
+
+            if (userInput.equals("list")) {
                 if (list.isEmpty()) {
                     printOutput("Nothing in list yet.");
                     continue;
@@ -37,94 +132,20 @@ public class Peter {
                     }
                 }
                 printOutput(listStr);
-            } else if (userInput.startsWith("mark") || userInput.startsWith("unmark")) {
-                // then mark the right item
-                String[] splitStr = userInput.split(" ");
-                String invalidMsg = "Invalid index. Item does not exist in list.";
+                continue;
+            }
 
-                try {
-                    int markIndex = Integer.parseInt(splitStr[1]) - 1;
-
-                    if (markIndex < 0 || markIndex >= list.size()) {
-                        printOutput(invalidMsg);
-                        continue;
-                    }
-
-                    Task task = list.get(markIndex);
-
-                    if (userInput.startsWith("mark")) {
-                        task.markAsDone();
-                        printOutput("Keep it up! I've marked this task as done:\n" +
-                                task);
-                    } else {
-                        task.markAsUndone();
-                        printOutput("Got it. I've marked this task as not done yet:\n" +
-                                task);
-                    }
-                } catch (Exception e) {
-                    printOutput(invalidMsg);
+            try {
+                if (userInput.startsWith("mark") || userInput.startsWith("unmark")) {
+                    markTask(userInput, list);
+                } else if (userInput.startsWith("todo") || userInput.startsWith("deadline") || userInput.startsWith("event")) {
+                    addTask(userInput, list);
+                } else {
+                    printOutput("Sorry, I do not know what that means. Would you like to add\n" +
+                            "a task using 'todo', 'deadline' or 'event'?");
                 }
-            } else if (userInput.startsWith("todo")) {
-                if (userInput.length() <= 5) {
-                    printOutput("Sorry! Description of todo cannot be empty.");
-                    continue;
-                }
-                userInput = userInput.substring(5);
-                Task todo = new Todo(userInput);
-                list.add(todo);
-                printOutput(">> Got it! I've added this task:\n" +
-                        todo +
-                        "\nNow you have " + list.size() + " tasks in your list.");
-
-            } else if (userInput.startsWith("deadline")) {
-                if (userInput.length() <= 9) {
-                    printOutput("Sorry! Description of deadline cannot be empty.");
-                    continue;
-                }
-                userInput = userInput.substring(9);
-
-                if (!userInput.contains(" /by ")) {
-                    printOutput("Incorrect format. Should be deadline <task> /by <time>");
-                    continue;
-                }
-
-                String[] inputArr = userInput.split(" /by ");
-                Task deadline = new Deadline(inputArr[0], inputArr[1]);
-                list.add(deadline);
-                printOutput(">> Got it! I've added this task:\n" +
-                        deadline +
-                        "\nNow you have " + list.size() + " tasks in your list.");
-
-            } else if (userInput.startsWith("event")) {
-                if (userInput.length() <= 6) {
-                    printOutput("Sorry! Description of event cannot be empty.");
-                    continue;
-                }
-
-                userInput = userInput.substring(6);
-
-                if (!userInput.contains(" /from ") || !userInput.contains(" /to ")) {
-                    printOutput("Incorrect format. Should be event <task> /from <time> /to <time>");
-                    continue;
-                }
-
-                // read book /from 12 June /to 14 June
-                String[] inputArr = userInput.split(" /from ");
-                String description = inputArr[0];
-
-                String[] dateArr = inputArr[1].split(" /to ");
-                String start = dateArr[0];
-                String end = dateArr[1];
-
-                Task event = new Event(description, start, end);
-                list.add(event);
-                printOutput(">> Got it! I've added this task:\n" +
-                        event +
-                        "\nNow you have " + list.size() + " tasks in your list.");
-
-            } else {
-                printOutput("Sorry, I do not know what that means. Would you like to add\n" +
-                        "a task using 'todo', 'deadline' or 'event'?");
+            } catch (Exception e) {
+                printOutput(e.getMessage());
             }
         }
     }
