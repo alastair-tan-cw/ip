@@ -64,6 +64,50 @@ public class Peter {
                 } catch (Exception e) {
                     printOutput(invalidMsg);
                 }
+            } else if (userInput.startsWith("todo")) {
+                userInput = userInput.substring(5);
+                Task todo = new Todo(userInput);
+                list.add(todo);
+                printOutput(">> Got it! I've added this task: \n" +
+                        todo +
+                        "\nNow you have " + list.size() + " tasks in your list.");
+
+            } else if (userInput.startsWith("deadline")) {
+                userInput = userInput.substring(9);
+
+                if (!userInput.contains(" /by ")) {
+                    printOutput("Incorrect format. Should be deadline <task> /by <time>");
+                    continue;
+                }
+
+                String[] inputArr = userInput.split(" /by ");
+                Task deadline = new Deadline(inputArr[0], inputArr[1]);
+                list.add(deadline);
+                printOutput(">> Got it! I've added this task: \n" +
+                        deadline +
+                        "\nNow you have " + list.size() + " tasks in your list.");
+
+            } else if (userInput.startsWith("event")) {
+                userInput = userInput.substring(6);
+
+                if (!userInput.contains(" /from ") || !userInput.contains(" /to ")) {
+                    printOutput("Incorrect format. Should be event <task> /from <time> /to <time>");
+                    continue;
+                }
+
+                // read book /from 12 June /to 14 June
+                String[] inputArr = userInput.split(" /from ");
+                String description = inputArr[0];
+
+                String[] dateArr = inputArr[1].split(" /to ");
+                String start = dateArr[0];
+                String end = dateArr[1];
+
+                Task event = new Event(description, start, end);
+                list.add(event);
+                printOutput(">> Got it! I've added this task: \n" +
+                        event +
+                        "\nNow you have " + list.size() + " tasks in your list.");
 
             } else {
                 list.add(new Task(userInput));
