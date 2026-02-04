@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class Peter {
     public static final String NAME = "Peter";
@@ -44,12 +46,20 @@ public class Peter {
             }
 
             String[] inputArr = userInput.split(" /by ");
-            Task deadline = new Deadline(inputArr[0], inputArr[1]);
-            list.add(deadline);
-            saveFile(list);
-            printOutput(">> Got it! I've added this task:\n" +
-                    deadline +
-                    "\nNow you have " + list.size() + " tasks in your list.");
+
+            try {
+                LocalDate date = LocalDate.parse(inputArr[1]);
+                Task deadline = new Deadline(inputArr[0], date);
+
+                list.add(deadline);
+                saveFile(list);
+                printOutput(">> Got it! I've added this task:\n" +
+                        deadline +
+                        "\nNow you have " + list.size() + " tasks in your list.");
+
+            } catch (DateTimeParseException e) {
+                throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
+            }
         }
 
         if (userInput.startsWith("event")) {
@@ -129,6 +139,7 @@ public class Peter {
         }
 
         Task task = list.remove(delIndex);
+        saveFile(list);
         printOutput("Noted. I've removed this task:\n" +
                 task +
                 "\nNow you have " + list.size() + " tasks in your list.");
@@ -157,7 +168,7 @@ public class Peter {
                         task = new Todo(description);
                         break;
                     case "D":
-                        String by = parts[3];
+                        LocalDate by = LocalDate.parse(parts[3]);
                         task = new Deadline(description, by);
                         break;
                     case "E":
