@@ -10,7 +10,21 @@ import java.time.format.DateTimeParseException;
 
 public class Peter {
     public static final String NAME = "Peter";
-    public static final String FILE_PATH = "./data/peter.txt";
+    public static final String FILE_PATH = "./data/storagetest.txt";
+    private static Storage storage = new Storage(FILE_PATH);
+    private TaskList tasks;
+    private Ui ui;
+
+    public Peter(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        try {
+            tasks = new TaskList(storage.loadFile());
+        } catch (PeterException e) {
+            ui.showFileError();
+            tasks = new TaskList();
+        }
+    }
 
     public static void printOutput (String input) {
         System.out.println("____________________________________________________________\n" +
@@ -27,7 +41,7 @@ public class Peter {
             userInput = userInput.substring(5);
             Task todo = new Todo(userInput);
             list.add(todo);
-            saveFile(list);
+            storage.saveFile(list);
             printOutput(">> Got it! I've added this task:\n" +
                     todo +
                     "\nNow you have " + list.size() + " tasks in your list.");
@@ -52,7 +66,7 @@ public class Peter {
                 Task deadline = new Deadline(inputArr[0], date);
 
                 list.add(deadline);
-                saveFile(list);
+                storage.saveFile(list);
                 printOutput(">> Got it! I've added this task:\n" +
                         deadline +
                         "\nNow you have " + list.size() + " tasks in your list.");
@@ -83,7 +97,7 @@ public class Peter {
 
             Task event = new Event(description, start, end);
             list.add(event);
-            saveFile(list);
+            storage.saveFile(list);
             printOutput(">> Got it! I've added this task:\n" +
                     event +
                     "\nNow you have " + list.size() + " tasks in your list.");
@@ -111,12 +125,12 @@ public class Peter {
 
             if (userInput.startsWith("mark")) {
                 task.markAsDone();
-                saveFile(list);
+                storage.saveFile(list);
                 printOutput("Keep it up! I've marked this task as done:\n" +
                         task);
             } else {
                 task.markAsUndone();
-                saveFile(list);
+                storage.saveFile(list);
                 printOutput("Got it. I've marked this task as not done yet:\n" +
                         task);
             }
@@ -139,102 +153,23 @@ public class Peter {
         }
 
         Task task = list.remove(delIndex);
-        saveFile(list);
+        storage.saveFile(list);
         printOutput("Noted. I've removed this task:\n" +
                 task +
                 "\nNow you have " + list.size() + " tasks in your list.");
     }
 
-    public static void loadFile(List<Task> list){
-        try {
-            File file = new File(FILE_PATH);
-            if (!file.exists()) {
-                return;
-            }
-            Scanner sc = new Scanner(file);
-
-            while (sc.hasNext()) {
-                String[] parts = sc.nextLine().split(" \\| "); // Split by " | "
-
-                // task details in the .txt file
-                String type = parts[0];
-                boolean isDone = parts[1].equals("1");
-                String description = parts[2];
-
-                Task task = null;
-
-                switch (type) {
-                    case "T":
-                        task = new Todo(description);
-                        break;
-                    case "D":
-                        LocalDate by = LocalDate.parse(parts[3]);
-                        task = new Deadline(description, by);
-                        break;
-                    case "E":
-                        String start = parts[3];
-                        String end = parts[4];
-                        task = new Event(description, start, end);
-                        break;
-                }
-
-                // if not corrupted/improper format then add to list
-                if (task != null) {
-                    if (isDone) {
-                        task.markAsDone();
-                    }
-                    list.add(task);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("No saved tasks found. Starting with empty list.");
-        } catch (Exception e) {
-            System.out.println("Error loading file: " + e.getMessage());
-        }
-    }
-
-    public static void saveFile(List<Task> list){
-        try {
-            // Handle case where folder doesn't exist yet
-            File file = new File(FILE_PATH);
-            if (file.getParentFile() != null) {
-                file.getParentFile().mkdirs();
-            }
-
-            FileWriter writer = new FileWriter(FILE_PATH);
-
-            for (Task task : list) {
-                String type = "";
-                String dates = "";
-
-                if (task instanceof Todo) {
-                    type = "T";
-                } else if (task instanceof Deadline) {
-                    type = "D";
-                    Deadline deadline = (Deadline) task;
-                    dates = " | " + deadline.by;
-                } else if (task instanceof Event) {
-                    type = "E";
-                    Event event = (Event) task;
-                    dates = " | " + event.start + " | " + event.end;
-                }
-
-                String isDone = task.isDone ? "1" : "0"; // Assuming 'isDone' is boolean
-                String eachTask = type + " | " + isDone + " | " + task.description + dates;
-
-                writer.write(eachTask + "\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("Error saving file: " + e.getMessage());
-        }
-    }
-
     public static void main(String[] args) {
         List<Task> list = new ArrayList<>();
-        loadFile(list);
+
+        try {
+            list = storage.loadFile();
+        } catch (PeterException e) {
+            printOutput("Error loading file.");
+        }
         String menu = " Hello! I'm " + NAME + "\n" +
                 " What can I do for you?";
+
         printOutput(menu);
 
         Scanner sc = new Scanner(System.in);
