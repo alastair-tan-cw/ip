@@ -1,3 +1,11 @@
+package peter.storage;
+
+import peter.task.Task;
+import peter.task.Todo;
+import peter.task.Deadline;
+import peter.task.Event;
+import peter.exception.PeterException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -15,7 +23,7 @@ public class Storage {
         this.filePath = filePath;
     }
 
-    public List<Task> loadFile() throws PeterException{
+    public List<Task> loadFile() throws PeterException {
         List<Task> list = new ArrayList<>();
         File file = new File(filePath);
         if (!file.exists()) {
@@ -85,15 +93,15 @@ public class Storage {
                 } else if (task instanceof Deadline) {
                     type = "D";
                     Deadline deadline = (Deadline) task;
-                    dates = " | " + deadline.by;
+                    dates = " | " + deadline.getBy();
                 } else if (task instanceof Event) {
                     type = "E";
                     Event event = (Event) task;
-                    dates = " | " + event.start + " | " + event.end;
+                    dates = " | " + event.getStart() + " | " + event.getEnd();
                 }
 
-                String isDone = task.isDone ? "1" : "0"; // Assuming 'isDone' is boolean
-                String eachTask = type + " | " + isDone + " | " + task.description + dates;
+                String isDone = task.isDone() ? "1" : "0"; // Assuming 'isDone' is boolean
+                String eachTask = type + " | " + isDone + " | " + task.getDescription() + dates;
                 writer.write(eachTask + "\n");
             }
             writer.close();

@@ -1,3 +1,5 @@
+package peter.ui;
+
 public class Ui {
     public static final String NAME = "Peter";
 
