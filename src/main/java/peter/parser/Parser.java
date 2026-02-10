@@ -8,7 +8,20 @@ import peter.ui.Ui;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Parses user input and executes the corresponding commands.
+ */
 public class Parser {
+
+    /**
+     * Parses the user input and performs the requested action.
+     *
+     * @param userInput The full input string entered by the user.
+     * @param tasks     The current list of tasks.
+     * @param ui        The UI object to handle user interaction.
+     * @param storage   The Storage object to handle loading and saving data.
+     * @return true if the user input is the exit command ("bye"), false otherwise.
+     */
     public static boolean parse(String userInput, TaskList tasks, Ui ui, Storage storage) {
         try {
             String[] splitStr = userInput.split(" ", 2);
