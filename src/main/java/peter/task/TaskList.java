@@ -33,4 +33,14 @@ public class TaskList {
     public List<Task> getAllTasks() {
         return tasks;
     }
+
+    public List<Task> findTasks(String input) {
+        List<Task> foundTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.toString().contains(input)) {
+                foundTasks.add(task);
+            }
+        }
+        return foundTasks;
+    }
 }

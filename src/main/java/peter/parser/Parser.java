@@ -7,6 +7,7 @@ import peter.ui.Ui;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class Parser {
     public static boolean parse(String userInput, TaskList tasks, Ui ui, Storage storage) {
@@ -125,9 +126,28 @@ public class Parser {
                             event +
                             "\nNow you have " + tasks.size() + " tasks in your list.");
                     break;
-                default:
-                    throw new PeterException("Sorry, I do not know what that means. Would you like to add\n" +
-                            "a task using 'todo', 'deadline' or 'event'?");
+
+            case "find":
+                if (userInput.length() <= 5) {
+                    throw new PeterException("Sorry! Description to find cannot be empty.");
+                }
+                List<Task> foundTasks = tasks.findTasks(splitStr[1]);
+                if (foundTasks.isEmpty()) {
+                    throw new PeterException("There are no matching tasks in your list.");
+                }
+                String taskStr = "Here are the matching tasks in your list:\n";
+                for (int i = 0; i < foundTasks.size(); i++) {
+                    taskStr += i + 1 + "." + foundTasks.get(i);
+                    if (i != foundTasks.size() - 1) {
+                        taskStr += "\n";
+                    }
+                }
+                ui.printOutput(taskStr);
+                break;
+
+            default:
+                throw new PeterException("Sorry, I do not know what that means. Would you like to add\n" +
+                        "a task using 'todo', 'deadline' or 'event'?");
             }
 
         } catch (PeterException | DateTimeParseException | NumberFormatException | IndexOutOfBoundsException e) {
