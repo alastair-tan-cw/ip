@@ -16,7 +16,7 @@ public class Ui {
         printOutput("No saved tasks found. Starting with empty list.");
     }
 
-    public void printOutput (String input) {
+    public void printOutput(String input) {
         System.out.println("____________________________________________________________\n" +
                 input +
                 "\n____________________________________________________________");
