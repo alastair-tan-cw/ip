@@ -15,14 +15,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles the loading and saving of task data to a specified file on the hard drive.
+ */
 public class Storage {
     public static final String FILE_PATH = "./data/peter.txt";
     private String filePath;
 
+    /**
+     * Creates a new Storage object.
+     *
+     * @param filePath The relative path to the file where data is stored.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the data file.
+     *
+     * @return A list of tasks loaded from the file.
+     * @throws PeterException If the file exists but cannot be read properly.
+     */
     public List<Task> loadFile() throws PeterException {
         List<Task> list = new ArrayList<>();
         File file = new File(filePath);
@@ -74,6 +88,11 @@ public class Storage {
         return list;
     }
 
+    /**
+     * Saves the current list of tasks to the data file.
+     *
+     * @param list The list of tasks to be saved.
+     */
     public void saveFile(List<Task> list){
         try {
             // Handle case where folder doesn't exist yet
@@ -100,7 +119,7 @@ public class Storage {
                     dates = " | " + event.getStart() + " | " + event.getEnd();
                 }
 
-                String isDone = task.isDone() ? "1" : "0"; // Assuming 'isDone' is boolean
+                String isDone = task.isDone() ? "1" : "0";
                 String eachTask = type + " | " + isDone + " | " + task.getDescription() + dates;
                 writer.write(eachTask + "\n");
             }
