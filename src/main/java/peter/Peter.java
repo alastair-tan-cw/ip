@@ -1,3 +1,5 @@
+package peter;
+
 import peter.exception.PeterException;
 import peter.parser.Parser;
 import peter.storage.Storage;
@@ -7,7 +9,7 @@ import peter.ui.Ui;
 import java.util.Scanner;
 
 /**
- * The main entry of the Peter chatbot application.
+ * The main entry of the peter.Peter chatbot application.
  * Initializes the UI, Storage, and TaskList, and runs the main input loop.
  */
 public class Peter {
