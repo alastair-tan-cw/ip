@@ -207,8 +207,8 @@ public class Parser {
                 }
                 Task deletedTask = tasks.delete(delIndex);
                 storage.saveFile(tasks.getAllTasks());
-                return "Noted. I've removed this task:\n" + deletedTask +
-                        "\nNow you have " + tasks.size() + " tasks in your list.";
+                return formatString("Noted. I've removed this task:", deletedTask.toString(),
+                        "Now you have " + tasks.size() + " tasks in your list.");
 
             case "mark":
                 int markIndex = Integer.parseInt(splitStr[1]) - 1;
@@ -217,7 +217,7 @@ public class Parser {
                 }
                 tasks.get(markIndex).markAsDone();
                 storage.saveFile(tasks.getAllTasks());
-                return "Keep it up! I've marked this task as done:\n" + tasks.get(markIndex);
+                return formatString("Keep it up! I've marked this task as done:", tasks.get(markIndex).toString());
 
             case "unmark":
                 int unmarkIndex = Integer.parseInt(splitStr[1]) - 1;
@@ -226,7 +226,7 @@ public class Parser {
                 }
                 tasks.get(unmarkIndex).markAsUndone();
                 storage.saveFile(tasks.getAllTasks());
-                return "Keep it up! I've unmarked this task:\n" + tasks.get(unmarkIndex);
+                return formatString("Keep it up! I've unmarked this task:", tasks.get(unmarkIndex).toString());
 
             case "todo":
                 if (userInput.length() <= 5) {
@@ -235,8 +235,8 @@ public class Parser {
                 Task todo = new Todo(splitStr[1]);
                 tasks.add(todo);
                 storage.saveFile(tasks.getAllTasks());
-                return ">> Got it! I've added this task:\n" + todo +
-                        "\nNow you have " + tasks.size() + " tasks in your list.";
+                return formatString( ">> Got it! I've added this task:", todo.toString(),
+                        "Now you have " + tasks.size() + " tasks in your list.");
 
             case "deadline":
                 if (userInput.length() <= 9) {
@@ -255,9 +255,9 @@ public class Parser {
 
                     tasks.add(deadline);
                     storage.saveFile(tasks.getAllTasks());
-                    return ">> Got it! I've added this task:\n" +
-                            deadline +
-                            "\nNow you have " + tasks.size() + " tasks in your list.";
+                    return formatString(">> Got it! I've added this task:",
+                            deadline.toString(),
+                            "Now you have " + tasks.size() + " tasks in your list.");
 
                 } catch (DateTimeParseException e) {
                     throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
@@ -283,9 +283,9 @@ public class Parser {
                 Task event = new Event(description, start, end);
                 tasks.add(event);
                 storage.saveFile(tasks.getAllTasks());
-                return ">> Got it! I've added this task:\n" +
-                        event +
-                        "\nNow you have " + tasks.size() + " tasks in your list.";
+                return formatString(">> Got it! I've added this task:",
+                        event.toString(),
+                        "Now you have " + tasks.size() + " tasks in your list.");
 
             case "find":
                 if (userInput.length() <= 5) {
@@ -312,5 +312,17 @@ public class Parser {
         } catch (PeterException | DateTimeParseException | NumberFormatException | IndexOutOfBoundsException e) {
             return e.getMessage();
         }
+    }
+
+    /**
+     * Returns a formatted string joined by newlines.
+     * @param input Variable number of strings to join.
+     */
+    public static String formatString(String ... input) {
+        StringBuilder sb = new StringBuilder();
+        for (String i : input) {
+            sb.append(i).append("\n");
+        }
+        return sb.toString();
     }
 }
