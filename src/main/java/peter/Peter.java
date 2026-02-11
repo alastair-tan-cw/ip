@@ -20,12 +20,10 @@ public class Peter {
     /**
      * Initializes the application with the specified file path for storage.
      * Attempts to load existing data from the file; if file does not exist or is corrupted, starts with an empty list.
-     *
-     * @param filePath The file path where task data is stored.
      */
-    public Peter(String filePath) {
+    public Peter() {
         ui = new Ui();
-        storage = new Storage(filePath);
+        storage = new Storage("./data/peter.txt");
         try {
             tasks = new TaskList(storage.loadFile());
         } catch (PeterException e) {
@@ -49,12 +47,20 @@ public class Peter {
         }
     }
 
+    public String getResponse(String input) {
+        try {
+            return Parser.parseGui(input, tasks, storage);
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
     /**
      * The main method that starts the application.
      *
      * @param args Command line arguments (unused).
      */
     public static void main(String[] args) {
-        new Peter("./data/peter.txt").run();
+//        new Peter("./data/peter.txt").run();
     }
 }
