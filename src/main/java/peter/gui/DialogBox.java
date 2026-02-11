@@ -1,4 +1,4 @@
-package peter;
+package peter.gui;
 
 import java.io.IOException;
 import java.util.Collections;

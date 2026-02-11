@@ -1,4 +1,4 @@
-package peter;
+package peter.gui;
 
 import java.io.IOException;
 
@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import peter.Peter;
 
 public class Main extends Application {
     private Peter peter = new Peter();

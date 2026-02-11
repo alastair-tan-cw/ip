@@ -1,4 +1,4 @@
-package peter;
+package peter.gui;
 
 import javafx.application.Application;
 
