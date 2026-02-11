@@ -305,7 +305,7 @@ public class Parser {
                 return taskStr;
 
             default:
-                throw new PeterException("Sorry, I do not know what that means. Would you like to add\n" +
+                throw new PeterException("Sorry, I do not know what that means. Would you like to add " +
                         "a task using 'todo', 'deadline' or 'event'?");
             }
 

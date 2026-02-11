@@ -1,6 +1,6 @@
 .label {
-    -fx-background-color: linear-gradient(to bottom right, #00ffbf, #00ddff);
-    -fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;
+    -fx-background-color: #b7becc;
+    -fx-border-color: #5c5d69;
     -fx-border-width: 2px;
     -fx-background-radius: 1em 1em 0 1em;
     -fx-border-radius: 1em 1em 0 1em;
@@ -21,5 +21,10 @@
 
     /* Rotate image clockwise by degrees. */
     -fx-rotate: 0;
+}
+
+#dialog {
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
 }
 
