@@ -58,18 +58,18 @@ public class Storage {
                 Task task = null;
 
                 switch (type) {
-                    case "T":
-                        task = new Todo(description);
-                        break;
-                    case "D":
-                        LocalDate by = LocalDate.parse(parts[3]);
-                        task = new Deadline(description, by);
-                        break;
-                    case "E":
-                        String start = parts[3];
-                        String end = parts[4];
-                        task = new Event(description, start, end);
-                        break;
+                case "T":
+                    task = new Todo(description);
+                    break;
+                case "D":
+                    LocalDate by = LocalDate.parse(parts[3]);
+                    task = new Deadline(description, by);
+                    break;
+                case "E":
+                    String start = parts[3];
+                    String end = parts[4];
+                    task = new Event(description, start, end);
+                    break;
                 }
 
                 // if not corrupted/improper format then add to list
@@ -93,7 +93,7 @@ public class Storage {
      *
      * @param list The list of tasks to be saved.
      */
-    public void saveFile(List<Task> list){
+    public void saveFile(List<Task> list) {
         try {
             // Handle case where folder doesn't exist yet
             File file = new File(filePath);
@@ -104,28 +104,44 @@ public class Storage {
             FileWriter writer = new FileWriter(filePath);
 
             for (Task task : list) {
-                String type = "";
-                String dates = "";
-
-                if (task instanceof Todo) {
-                    type = "T";
-                } else if (task instanceof Deadline) {
-                    type = "D";
-                    Deadline deadline = (Deadline) task;
-                    dates = " | " + deadline.getBy();
-                } else if (task instanceof Event) {
-                    type = "E";
-                    Event event = (Event) task;
-                    dates = " | " + event.getStart() + " | " + event.getEnd();
-                }
-
-                String isDone = task.isDone() ? "1" : "0";
-                String eachTask = type + " | " + isDone + " | " + task.getDescription() + dates;
+                String eachTask = formatTask(task);
                 writer.write(eachTask + "\n");
             }
             writer.close();
         } catch (IOException e) {
             System.out.println("Error saving file: " + e.getMessage());
         }
+    }
+
+    /**
+     * Converts a Task object into a formatted string for file storage.
+     * Format: TYPE | STATUS | DESCRIPTION | TIME
+     * E.g: D | 1 | return book | 2026-02-25
+     *
+     * @param task The task to convert.
+     * @return A formatted string to be written in the text file when saved.
+     */
+    public String formatTask(Task task) {
+        String type = "";
+        String dates = "";
+
+        if (task instanceof Todo) {
+            type = "T";
+        }
+
+        if (task instanceof Deadline) {
+            type = "D";
+            Deadline deadline = (Deadline) task;
+            dates = " | " + deadline.getBy();
+        }
+
+        if (task instanceof Event) {
+            type = "E";
+            Event event = (Event) task;
+            dates = " | " + event.getStart() + " | " + event.getEnd();
+        }
+
+        String isDone = task.isDone() ? "1" : "0";
+        return type + " | " + isDone + " | " + task.getDescription() + dates;
     }
 }
