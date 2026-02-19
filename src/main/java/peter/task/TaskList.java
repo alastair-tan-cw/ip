@@ -2,6 +2,7 @@ package peter.task;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Supports operations to get, add, delete tasks from list.
@@ -73,12 +74,8 @@ public class TaskList {
     }
 
     public List<Task> findTasks(String input) {
-        List<Task> foundTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.toString().contains(input)) {
-                foundTasks.add(task);
-            }
-        }
-        return foundTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(input))
+                .collect(Collectors.toList());
     }
 }
