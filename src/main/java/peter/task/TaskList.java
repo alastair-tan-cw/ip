@@ -72,6 +72,27 @@ public class TaskList {
         return tasks;
     }
 
+    /**
+     * Returns a formatted string of all tasks in the list.
+     *
+     * @return The list of tasks in String format.
+     */
+    public String getAllTasksAsString() {
+        String listStr = "Here are the tasks in your list:\n";
+        for (int i = 0; i < tasks.size(); i++) {
+            listStr += i + 1 + "." + tasks.get(i);
+            if (i != tasks.size() - 1) {
+                listStr += "\n";
+            }
+        }
+        return listStr;
+    }
+
+    /**
+     * Returns a list of tasks containing provided keyword.
+     *
+     * @return The list of tasks in String format.
+     */
     public List<Task> findTasks(String input) {
         List<Task> foundTasks = new ArrayList<>();
         for (Task task : tasks) {

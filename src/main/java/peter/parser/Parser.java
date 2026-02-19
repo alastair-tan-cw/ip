@@ -19,7 +19,7 @@ import java.util.List;
 public class Parser {
 
     /**
-     * Parses the user input and performs the requested action.
+     * Parses the user input and performs the requested action for CLI.
      *
      * @param userInput The full input string entered by the user.
      * @param tasks     The current list of tasks.
@@ -30,135 +30,43 @@ public class Parser {
     public static boolean parse(String userInput, TaskList tasks, Ui ui, Storage storage) {
         try {
             String[] splitStr = userInput.split(" ", 2);
+            String args = splitStr.length > 1 ? splitStr[1] : "";
+
             switch(splitStr[0]) {
             case "bye":
                 ui.printOutput("Goodbye. Chat again soon?");
                 return true;
 
             case "list":
-                if (tasks.size() == 0) {
-                    ui.printOutput("Nothing in list yet.");
-                    break;
-                }
-                String listStr = "Here are the tasks in your list:\n";
-                for (int i = 0; i < tasks.size(); i++) {
-                    listStr += i + 1 + "." + tasks.get(i);
-                    if (i != tasks.size() - 1) {
-                        listStr += "\n";
-                    }
-                }
-                ui.printOutput(listStr);
+                ui.printOutput(listTasks(tasks));
                 break;
 
             case "delete":
-                int delIndex = Integer.parseInt(splitStr[1]) - 1;
-                if (delIndex < 0 || delIndex >= tasks.size()) {
-                    throw new PeterException("Invalid index. Item does not exist in list.");
-                }
-                Task deletedTask = tasks.delete(delIndex);
-                storage.saveFile(tasks.getAllTasks());
-                ui.printOutput("Noted. I've removed this task:\n" + deletedTask +
-                        "\nNow you have " + tasks.size() + " tasks in your list.");
+                ui.printOutput(deleteTask(args, tasks, storage));
                 break;
 
             case "mark":
-                int markIndex = Integer.parseInt(splitStr[1]) - 1;
-                if (markIndex < 0 || markIndex >= tasks.size()) {
-                    throw new PeterException("Invalid index. Item does not exist in list.");
-                }
-                tasks.get(markIndex).markAsDone();
-                storage.saveFile(tasks.getAllTasks());
-                ui.printOutput("Keep it up! I've marked this task as done:\n" + tasks.get(markIndex));
+                ui.printOutput(markTask(args, tasks, storage));
                 break;
 
             case "unmark":
-                int unmarkIndex = Integer.parseInt(splitStr[1]) - 1;
-                if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                    throw new PeterException("Invalid index. Item does not exist in list.");
-                }
-                tasks.get(unmarkIndex).markAsUndone();
-                storage.saveFile(tasks.getAllTasks());
-                ui.printOutput("Keep it up! I've unmarked this task:\n" + tasks.get(unmarkIndex));
+                ui.printOutput(unmarkTask(args, tasks, storage));
                 break;
 
             case "todo":
-                if (userInput.length() <= 5) {
-                    throw new PeterException("Sorry! Description of todo cannot be empty.");
-                }
-                Task todo = new Todo(splitStr[1]);
-                tasks.add(todo);
-                storage.saveFile(tasks.getAllTasks());
-                ui.printOutput(">> Got it! I've added this task:\n" + todo +
-                        "\nNow you have " + tasks.size() + " tasks in your list.");
+                ui.printOutput(addTodo(args, tasks, storage));
                 break;
 
             case "deadline":
-                if (userInput.length() <= 9) {
-                    throw new PeterException("Sorry! Description of event cannot be empty.");
-                }
-
-                if (!splitStr[1].contains(" /by ")) {
-                    throw new PeterException("Incorrect format. Should be deadline <task> /by <time>");
-                }
-
-                String[] dSplit = splitStr[1].split(" /by ");
-
-                try {
-                    LocalDate date = LocalDate.parse(dSplit[1]);
-                    Task deadline = new Deadline(dSplit[0], date);
-
-                    tasks.add(deadline);
-                    storage.saveFile(tasks.getAllTasks());
-                    ui.printOutput(">> Got it! I've added this task:\n" +
-                            deadline +
-                            "\nNow you have " + tasks.size() + " tasks in your list.");
-
-                } catch (DateTimeParseException e) {
-                    throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
-                }
-
+                ui.printOutput(addDeadline(args, tasks, storage));
                 break;
 
             case "event":
-                if (userInput.length() <= 6) {
-                    throw new PeterException("Sorry! Description of event cannot be empty.");
-                }
-
-                if (!splitStr[1].contains(" /from ") || !splitStr[1].contains(" /to ")) {
-                    throw new PeterException("Incorrect format. Should be event <task> /from <time> /to <time>");
-                }
-
-                // read book /from 12 June /to 14 June
-                String[] inputArr = splitStr[1].split(" /from ");
-                String description = inputArr[0];
-
-                String[] dateArr = inputArr[1].split(" /to ");
-                String start = dateArr[0];
-                String end = dateArr[1];
-
-                Task event = new Event(description, start, end);
-                tasks.add(event);
-                storage.saveFile(tasks.getAllTasks());
-                ui.printOutput(">> Got it! I've added this task:\n" +
-                        event +
-                        "\nNow you have " + tasks.size() + " tasks in your list.");
+                ui.printOutput(addEvent(args, tasks, storage));
                 break;
+
             case "find":
-                if (userInput.length() <= 5) {
-                    throw new PeterException("Sorry! Description to find cannot be empty.");
-                }
-                List<Task> foundTasks = tasks.findTasks(splitStr[1]);
-                if (foundTasks.isEmpty()) {
-                    throw new PeterException("There are no matching tasks in your list.");
-                }
-                String taskStr = "Here are the matching tasks in your list:\n";
-                for (int i = 0; i < foundTasks.size(); i++) {
-                    taskStr += i + 1 + "." + foundTasks.get(i);
-                    if (i != foundTasks.size() - 1) {
-                        taskStr += "\n";
-                    }
-                }
-                ui.printOutput(taskStr);
+                ui.printOutput(findTasks(args, tasks));
                 break;
 
             default:
@@ -173,7 +81,7 @@ public class Parser {
     }
 
     /**
-     * Parses the user input and performs the requested action.
+     * Parses the user input and performs the requested action for GUI.
      *
      * @param userInput The full input string entered by the user.
      * @param tasks     The current list of tasks.
@@ -183,126 +91,34 @@ public class Parser {
     public static String parseGui(String userInput, TaskList tasks, Storage storage) {
         try {
             String[] splitStr = userInput.split(" ", 2);
+            String args = splitStr.length > 1 ? splitStr[1] : "";
             switch(splitStr[0]) {
             case "bye":
                 return "Goodbye. Chat again soon?";
 
             case "list":
-                if (tasks.size() == 0) {
-                    return "Nothing in list yet.";
-                }
-                String listStr = "Here are the tasks in your list:\n";
-                for (int i = 0; i < tasks.size(); i++) {
-                    listStr += i + 1 + "." + tasks.get(i);
-                    if (i != tasks.size() - 1) {
-                        listStr += "\n";
-                    }
-                }
-                return listStr;
+                return listTasks(tasks);
 
             case "delete":
-                int delIndex = Integer.parseInt(splitStr[1]) - 1;
-                if (delIndex < 0 || delIndex >= tasks.size()) {
-                    throw new PeterException("Invalid index. Item does not exist in list.");
-                }
-                Task deletedTask = tasks.delete(delIndex);
-                storage.saveFile(tasks.getAllTasks());
-                return formatString("Noted. I've removed this task:", deletedTask.toString(),
-                        "Now you have " + tasks.size() + " tasks in your list.");
+                return deleteTask(args, tasks, storage);
 
             case "mark":
-                int markIndex = Integer.parseInt(splitStr[1]) - 1;
-                if (markIndex < 0 || markIndex >= tasks.size()) {
-                    throw new PeterException("Invalid index. Item does not exist in list.");
-                }
-                tasks.get(markIndex).markAsDone();
-                storage.saveFile(tasks.getAllTasks());
-                return formatString("Keep it up! I've marked this task as done:", tasks.get(markIndex).toString());
+                return markTask(args, tasks, storage);
 
             case "unmark":
-                int unmarkIndex = Integer.parseInt(splitStr[1]) - 1;
-                if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                    throw new PeterException("Invalid index. Item does not exist in list.");
-                }
-                tasks.get(unmarkIndex).markAsUndone();
-                storage.saveFile(tasks.getAllTasks());
-                return formatString("Keep it up! I've unmarked this task:", tasks.get(unmarkIndex).toString());
+                return unmarkTask(args, tasks, storage);
 
             case "todo":
-                if (userInput.length() <= 5) {
-                    throw new PeterException("Sorry! Description of todo cannot be empty.");
-                }
-                Task todo = new Todo(splitStr[1]);
-                tasks.add(todo);
-                storage.saveFile(tasks.getAllTasks());
-                return formatString( ">> Got it! I've added this task:", todo.toString(),
-                        "Now you have " + tasks.size() + " tasks in your list.");
+                return addTodo(args, tasks, storage);
 
             case "deadline":
-                if (userInput.length() <= 9) {
-                    throw new PeterException("Sorry! Description of event cannot be empty.");
-                }
-
-                if (!splitStr[1].contains(" /by ")) {
-                    throw new PeterException("Incorrect format. Should be deadline <task> /by <time>");
-                }
-
-                String[] dSplit = splitStr[1].split(" /by ");
-
-                try {
-                    LocalDate date = LocalDate.parse(dSplit[1]);
-                    Task deadline = new Deadline(dSplit[0], date);
-
-                    tasks.add(deadline);
-                    storage.saveFile(tasks.getAllTasks());
-                    return formatString(">> Got it! I've added this task:",
-                            deadline.toString(),
-                            "Now you have " + tasks.size() + " tasks in your list.");
-
-                } catch (DateTimeParseException e) {
-                    throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
-                }
+                return addDeadline(args, tasks, storage);
 
             case "event":
-                if (userInput.length() <= 6) {
-                    throw new PeterException("Sorry! Description of event cannot be empty.");
-                }
-
-                if (!splitStr[1].contains(" /from ") || !splitStr[1].contains(" /to ")) {
-                    throw new PeterException("Incorrect format. Should be event <task> /from <time> /to <time>");
-                }
-
-                // read book /from 12 June /to 14 June
-                String[] inputArr = splitStr[1].split(" /from ");
-                String description = inputArr[0];
-
-                String[] dateArr = inputArr[1].split(" /to ");
-                String start = dateArr[0];
-                String end = dateArr[1];
-
-                Task event = new Event(description, start, end);
-                tasks.add(event);
-                storage.saveFile(tasks.getAllTasks());
-                return formatString(">> Got it! I've added this task:",
-                        event.toString(),
-                        "Now you have " + tasks.size() + " tasks in your list.");
+                return addEvent(args, tasks, storage);
 
             case "find":
-                if (userInput.length() <= 5) {
-                    throw new PeterException("Sorry! Description to find cannot be empty.");
-                }
-                List<Task> foundTasks = tasks.findTasks(splitStr[1]);
-                if (foundTasks.isEmpty()) {
-                    throw new PeterException("There are no matching tasks in your list.");
-                }
-                String taskStr = "Here are the matching tasks in your list:\n";
-                for (int i = 0; i < foundTasks.size(); i++) {
-                    taskStr += i + 1 + "." + foundTasks.get(i);
-                    if (i != foundTasks.size() - 1) {
-                        taskStr += "\n";
-                    }
-                }
-                return taskStr;
+                return findTasks(args, tasks);
 
             default:
                 throw new PeterException("Sorry, I do not know what that means. Would you like to add " +
@@ -312,6 +128,122 @@ public class Parser {
         } catch (PeterException | DateTimeParseException | NumberFormatException | IndexOutOfBoundsException e) {
             return e.getMessage();
         }
+    }
+
+    public static int checkIndex(String indexStr, int size) throws PeterException {
+        try {
+            int index = Integer.parseInt(indexStr) - 1;
+            if (index < 0 || index >= size) {
+                throw new PeterException("Invalid index. Item does not exist in list.");
+            }
+            return index;
+
+        } catch (NumberFormatException e) {
+            throw new PeterException("Invalid index format. Please enter a number.");
+        }
+    }
+
+    public static String listTasks(TaskList tasks) {
+        if (tasks.size() == 0) {
+            return "Nothing in list yet.";
+        }
+        return tasks.getAllTasksAsString();
+    }
+
+    public static String markTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
+        int index = checkIndex(indexStr, tasks.size());
+        tasks.get(index).markAsDone();
+        storage.saveFile(tasks.getAllTasks());
+        return formatString("Keep it up! I've marked this task as done:", tasks.get(index).toString());
+    }
+
+    public static String unmarkTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
+        int index = checkIndex(indexStr, tasks.size());
+        tasks.get(index).markAsUndone();
+        storage.saveFile(tasks.getAllTasks());
+        return formatString("Keep it up! I've unmarked this task:", tasks.get(index).toString());
+    }
+
+    public static String deleteTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
+        int index = checkIndex(indexStr, tasks.size());
+        Task deletedTask = tasks.delete(index);
+        storage.saveFile(tasks.getAllTasks());
+        return formatString("Noted. I've removed this task:", deletedTask.toString(),
+                "Now you have " + tasks.size() + " tasks in your list.");
+    }
+
+    public static String addTodo(String args, TaskList tasks, Storage storage) throws PeterException {
+        if (args.isEmpty()) {
+            throw new PeterException("Sorry! Description of todo cannot be empty.");
+        }
+        Task todo = new Todo(args);
+        tasks.add(todo);
+        storage.saveFile(tasks.getAllTasks());
+        return formatString(">> Got it! I've added this task:", todo.toString(),
+                "Now you have " + tasks.size() + " tasks in your list.");
+    }
+
+    public static String addDeadline(String args, TaskList tasks, Storage storage) throws PeterException {
+        if (args.isEmpty()) {
+            throw new PeterException("Sorry! Description of deadline cannot be empty.");
+        }
+        if (!args.contains(" /by ")) {
+            throw new PeterException("Incorrect format. Should be deadline <task> /by <time>");
+        }
+
+        String[] dSplit = args.split(" /by ", 2);
+        try {
+            LocalDate date = LocalDate.parse(dSplit[1]);
+            Task deadline = new Deadline(dSplit[0], date);
+            tasks.add(deadline);
+            storage.saveFile(tasks.getAllTasks());
+            return formatString(">> Got it! I've added this task:",
+                    deadline.toString(),
+                    "Now you have " + tasks.size() + " tasks in your list.");
+        } catch (DateTimeParseException e) {
+            throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
+        }
+    }
+
+    public static String addEvent(String args, TaskList tasks, Storage storage) throws PeterException {
+        if (args.isEmpty()) {
+            throw new PeterException("Sorry! Description of deadline cannot be empty.");
+        }
+
+        if (!args.contains(" /from ") || !args.contains(" /to ")) {
+            throw new PeterException("Incorrect format. Should be event <task> /from <time> /to <time>");
+        }
+
+        // read book /from 12 June /to 14 June
+        String[] inputArr = args.split(" /from ");
+        String description = inputArr[0];
+        String[] dateArr = inputArr[1].split(" /to ");
+        String start = dateArr[0];
+        String end = dateArr[1];
+        Task event = new Event(description, start, end);
+        tasks.add(event);
+        storage.saveFile(tasks.getAllTasks());
+        return formatString(">> Got it! I've added this task:",
+                event.toString(),
+                "Now you have " + tasks.size() + " tasks in your list.");
+    }
+
+    public static String findTasks(String args, TaskList tasks) throws PeterException {
+        if (args.isEmpty()) {
+            throw new PeterException("Sorry! Description to find cannot be empty.");
+        }
+        List<Task> foundTasks = tasks.findTasks(args);
+        if (foundTasks.isEmpty()) {
+            throw new PeterException("There are no matching tasks in your list.");
+        }
+        String taskStr = "Here are the matching tasks in your list:\n";
+        for (int i = 0; i < foundTasks.size(); i++) {
+            taskStr += i + 1 + "." + foundTasks.get(i);
+            if (i != foundTasks.size() - 1) {
+                taskStr += "\n";
+            }
+        }
+        return taskStr;
     }
 
     /**
