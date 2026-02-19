@@ -95,6 +95,7 @@ public class Storage {
      */
     public void saveFile(List<Task> list){
         try {
+            assert filePath != null && !filePath.isEmpty() : "File path is not specified!";
             // Handle case where folder doesn't exist yet
             File file = new File(filePath);
             if (file.getParentFile() != null) {
