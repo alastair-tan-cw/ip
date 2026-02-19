@@ -38,6 +38,11 @@ public class Event extends Task {
         return this.end;
     }
 
+    public void setStartEnd(String start, String end) {
+        this.start = start;
+        this.end = end;
+    }
+
     /**
      * Returns a string representation of the event task.
      *

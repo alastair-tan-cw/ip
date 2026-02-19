@@ -120,6 +120,9 @@ public class Parser {
             case "find":
                 return findTasks(args, tasks);
 
+            case "snooze":
+                return snoozeTask(args, tasks, storage);
+
             default:
                 throw new PeterException("Sorry, I do not know what that means. Would you like to add " +
                         "a task using 'todo', 'deadline' or 'event'?");
@@ -244,6 +247,48 @@ public class Parser {
             }
         }
         return taskStr;
+    }
+
+    public static String snoozeTask(String args, TaskList tasks, Storage storage) throws PeterException {
+        String[] inputArr = args.split(" ", 2);
+        if (inputArr.length < 2) {
+            throw new PeterException("Sorry! Please give me the task index you would like to snooze, and the new date(s)!");
+        }
+
+        // snooze "2 /from 240226 /to 260226" split to ["2", "/from 240226 /to 260226"]
+        int index = checkIndex(inputArr[0], tasks.size());
+        Task task = tasks.get(index);
+        String dateStr = " " + inputArr[1];
+
+        if (task instanceof Todo) {
+            throw new PeterException("Sorry! Todo task can't be snoozed as it does not have a date!");
+        }
+
+        if (task instanceof Deadline) {
+            if (!dateStr.contains(" /by ")) {
+                throw new PeterException("Incorrect format! For deadlines, format: snooze <index> /by <yyyy-mm-dd>.");
+            }
+            try {
+                // dateStr = " /by 250226" split to ["", "250226"]
+                String[] dateArr = dateStr.split(" /by ", 2);
+                LocalDate newDate = LocalDate.parse(dateArr[1]);
+                ((Deadline) task).setBy(newDate);
+            } catch (DateTimeParseException e) {
+                throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
+            }
+        }
+
+        if (task instanceof Event) {
+            if (!dateStr.contains(" /from ") || !dateStr.contains(" /to ")) {
+                throw new PeterException("Incorrect format! For events, use format: snooze <index> /from <date> /to <date>");
+            }
+            // dateStr = " /from 250226 /to 260226" split to ["", "250226 /to 260226"]
+            String[] dateArr = dateStr.split(" /from ", 2)[1].split(" /to ", 2);
+            ((Event) task).setStartEnd(dateArr[0], dateArr[1]);
+        }
+
+        storage.saveFile(tasks.getAllTasks());
+        return formatString("Got it! I've snoozed this task to the new date: ", task.toString());
     }
 
     /**
