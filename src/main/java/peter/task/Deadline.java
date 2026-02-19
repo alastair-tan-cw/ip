@@ -29,6 +29,10 @@ public class Deadline extends Task {
         return this.by;
     }
 
+    public void setBy(LocalDate by) {
+        this.by = by;
+    }
+
     /**
      * Returns a string representation of the deadline task.
      * The date is formatted as "MMM dd yyyy" (e.g. Oct 25 2026).
