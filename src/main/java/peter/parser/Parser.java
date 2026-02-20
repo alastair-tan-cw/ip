@@ -11,6 +11,7 @@ import peter.ui.Ui;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -210,7 +211,7 @@ public class Parser {
                     deadline.toString(),
                     "Now you have " + tasks.size() + " tasks in your list.");
         } catch (DateTimeParseException e) {
-            throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
+            throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2026-02-25).");
         }
     }
 
@@ -227,17 +228,25 @@ public class Parser {
         String[] inputArr = args.split(" /from ");
         String description = inputArr[0];
         String[] dateArr = inputArr[1].split(" /to ");
-        String start = dateArr[0];
-        String end = dateArr[1];
-        Task event = new Event(description, start, end);
-        if (tasks.isDuplicate(event)) {
-            throw new PeterException("Hold up boss! You already have this event in your list!");
+
+        try {
+            LocalDate start = LocalDate.parse(dateArr[0]);
+            LocalDate end = LocalDate.parse(dateArr[1]);
+            if (start.isAfter(end) || start.isEqual(end)) {
+                throw new PeterException("Wait! An event can't end before or on the same date it starts!");
+            }
+            Task event = new Event(description, start, end);
+            if (tasks.isDuplicate(event)) {
+                throw new PeterException("Hold up boss! You already have this event in your list!");
+            }
+            tasks.add(event);
+            storage.saveFile(tasks.getAllTasks());
+            return formatString(">> Okay added! I hope they have snacks there at this event:",
+                    event.toString(),
+                    "Now you have " + tasks.size() + " tasks in your list.");
+        } catch (DateTimeParseException e) {
+            throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd for dates (e.g. 2026-02-25).");
         }
-        tasks.add(event);
-        storage.saveFile(tasks.getAllTasks());
-        return formatString(">> Okay added! I hope they have snacks there at this event:",
-                event.toString(),
-                "Now you have " + tasks.size() + " tasks in your list.");
     }
 
     public static String findTasks(String args, TaskList tasks) throws PeterException {
@@ -283,7 +292,7 @@ public class Parser {
                 LocalDate newDate = LocalDate.parse(dateArr[1]);
                 ((Deadline) task).setBy(newDate);
             } catch (DateTimeParseException e) {
-                throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2024-01-30).");
+                throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd (e.g. 2026-02-25).");
             }
         }
 
@@ -293,7 +302,16 @@ public class Parser {
             }
             // dateStr = " /from 250226 /to 260226" split to ["", "250226 /to 260226"]
             String[] dateArr = dateStr.split(" /from ", 2)[1].split(" /to ", 2);
-            ((Event) task).setStartEnd(dateArr[0], dateArr[1]);
+            try {
+                LocalDate start = LocalDate.parse(dateArr[0]);
+                LocalDate end = LocalDate.parse(dateArr[1]);
+                if (start.isAfter(end) || start.isEqual(end)) {
+                    throw new PeterException("Wait! An event can't end before or on the same date it starts!");
+                }
+                ((Event) task).setStartEnd(start, end);
+            } catch (DateTimeParseException e) {
+                throw new PeterException("Invalid Date Format! Should be yyyy-mm-dd for dates (e.g. 2026-02-25).");
+            }
         }
 
         storage.saveFile(tasks.getAllTasks());

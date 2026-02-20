@@ -1,11 +1,14 @@
 package peter.task;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Represents a task that starts at a specific time and ends at a specific time.
  */
 public class Event extends Task {
-    protected String start;
-    protected String end;
+    protected LocalDate start;
+    protected LocalDate end;
 
     /**
      * Creates a new Event task.
@@ -14,7 +17,7 @@ public class Event extends Task {
      * @param start       The start time of the event.
      * @param end         The end time of the event.
      */
-    public Event(String description, String start, String end) {
+    public Event(String description, LocalDate start, LocalDate end) {
         super(description);
         this.start = start;
         this.end = end;
@@ -25,7 +28,7 @@ public class Event extends Task {
      *
      * @return The start time string.
      */
-    public String getStart() {
+    public LocalDate getStart() {
         return this.start;
     }
 
@@ -34,11 +37,11 @@ public class Event extends Task {
      *
      * @return The end time string.
      */
-    public String getEnd() {
+    public LocalDate getEnd() {
         return this.end;
     }
 
-    public void setStartEnd(String start, String end) {
+    public void setStartEnd(LocalDate start, LocalDate end) {
         this.start = start;
         this.end = end;
     }
@@ -50,6 +53,9 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + start + " to: " + end + ")";
+        return "[E]" + super.toString() + " (from: " +
+                start.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) +
+                " to: " +
+                end.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ")";
     }
 }
