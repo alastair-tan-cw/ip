@@ -134,6 +134,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Checks if user given index string is a valid a zero-based integer index existing in list.
+     *
+     * @param indexStr The string representation of the index entered by the user.
+     * @param size     The current size of the task list.
+     * @return The zero-based integer index.
+     * @throws PeterException If the index is not a number or is out of bounds.
+     */
     public static int checkIndex(String indexStr, int size) throws PeterException {
         try {
             int index = Integer.parseInt(indexStr) - 1;
@@ -147,6 +155,12 @@ public class Parser {
         }
     }
 
+    /**
+     * Retrieves a formatted string of all tasks currently in the list.
+     *
+     * @param tasks The current list of tasks.
+     * @return A formatted string representation of all tasks, or a message if empty.
+     */
     public static String listTasks(TaskList tasks) {
         if (tasks.size() == 0) {
             return "Nothing in list yet! Let me know if you need to add new tasks!";
@@ -154,6 +168,15 @@ public class Parser {
         return tasks.getAllTasksAsString();
     }
 
+    /**
+     * Marks a specified task as done based on the given index.
+     *
+     * @param indexStr The string representation of the task's index.
+     * @param tasks    The current list of tasks.
+     * @param storage  The Storage object to handle saving the updated list.
+     * @return A success message indicating the task was marked.
+     * @throws PeterException If the index is invalid or out of bounds.
+     */
     public static String markTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
         int index = checkIndex(indexStr, tasks.size());
         tasks.get(index).markAsDone();
@@ -161,6 +184,15 @@ public class Parser {
         return formatString("LET'S GO! This task is now marked as done:", tasks.get(index).toString());
     }
 
+    /**
+     * Marks a specified task as undone based on the given index.
+     *
+     * @param indexStr The string representation of the task's index.
+     * @param tasks    The current list of tasks.
+     * @param storage  The Storage object to handle saving the updated list.
+     * @return A confirmation message indicating the task was successfully unmarked.
+     * @throws PeterException If the index is invalid or out of bounds.
+     */
     public static String unmarkTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
         int index = checkIndex(indexStr, tasks.size());
         tasks.get(index).markAsUndone();
@@ -168,6 +200,15 @@ public class Parser {
         return formatString("No worries! This task has been unmarked:", tasks.get(index).toString());
     }
 
+    /**
+     * Deletes a specified task from the list based on the given index.
+     *
+     * @param indexStr The string representation of the task's index.
+     * @param tasks    The current list of tasks.
+     * @param storage  The Storage object to handle saving the updated list.
+     * @return A confirmation message indicating the task was successfully deleted.
+     * @throws PeterException If the index is invalid or out of bounds.
+     */
     public static String deleteTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
         int index = checkIndex(indexStr, tasks.size());
         Task deletedTask = tasks.delete(index);
@@ -176,6 +217,15 @@ public class Parser {
                 "You're now down to " + tasks.size() + " tasks in your list.");
     }
 
+    /**
+     * Adds a new Todo task to the list
+     *
+     * @param args    The description of the todo ask.
+     * @param tasks   The current list of tasks.
+     * @param storage The Storage object to handle saving the updated list.
+     * @return A confirmation message indicating the todo was successfully added.
+     * @throws PeterException If the description is empty or the task is a duplicate.
+     */
     public static String addTodo(String args, TaskList tasks, Storage storage) throws PeterException {
         if (args.isEmpty()) {
             throw new PeterException("Sorry! Description of todo cannot be empty.");
@@ -190,6 +240,15 @@ public class Parser {
                 "Now you have " + tasks.size() + " tasks in your list.");
     }
 
+    /**
+     * Adds a new Deadline task to the list.
+     *
+     * @param args    The arguments containing the description and deadline date.
+     * @param tasks   The current list of tasks.
+     * @param storage The Storage object to handle saving the updated list.
+     * @return A confirmation message indicating the deadline was successfully added.
+     * @throws PeterException If the format is incorrect, description is empty, date is invalid, or task is a duplicate.
+     */
     public static String addDeadline(String args, TaskList tasks, Storage storage) throws PeterException {
         if (args.isEmpty()) {
             throw new PeterException("Sorry! Description of deadline cannot be empty.");
@@ -215,6 +274,15 @@ public class Parser {
         }
     }
 
+    /**
+     * Adds a new Event task to the list.
+     *
+     * @param args    The arguments containing the description, start date, and end date.
+     * @param tasks   The current list of tasks.
+     * @param storage The Storage object to handle saving the updated list.
+     * @return A confirmation message indicating the event was successfully added.
+     * @throws PeterException If the format is incorrect, dates are invalid/illogical, or task is a duplicate.
+     */
     public static String addEvent(String args, TaskList tasks, Storage storage) throws PeterException {
         if (args.isEmpty()) {
             throw new PeterException("Sorry! Description of deadline cannot be empty.");
@@ -249,6 +317,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Finds and returns a list of tasks that match the given search keyword.
+     *
+     * @param args  The search keyword provided by the user.
+     * @param tasks The current list of tasks.
+     * @return A formatted string of all matching tasks.
+     * @throws PeterException If the search keyword is empty or no matches are found.
+     */
     public static String findTasks(String args, TaskList tasks) throws PeterException {
         if (args.isEmpty()) {
             throw new PeterException("Sorry! Description to find cannot be empty.");
@@ -267,6 +343,15 @@ public class Parser {
         return taskStr;
     }
 
+    /**
+     * Updates the dates of a Deadline or Event task.
+     *
+     * @param args    The arguments containing the task index and the new date(s).
+     * @param tasks   The current list of tasks.
+     * @param storage The Storage object to handle saving the updated list.
+     * @return A confirmation message indicating the task was successfully snoozed.
+     * @throws PeterException If the format is incorrect, dates are invalid, or if attempting to snooze a Todo task.
+     */
     public static String snoozeTask(String args, TaskList tasks, Storage storage) throws PeterException {
         String[] inputArr = args.split(" ", 2);
         if (inputArr.length < 2) {

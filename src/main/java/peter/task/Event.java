@@ -14,8 +14,8 @@ public class Event extends Task {
      * Creates a new Event task.
      *
      * @param description The description of the event.
-     * @param start       The start time of the event.
-     * @param end         The end time of the event.
+     * @param start       The start date of the event.
+     * @param end         The end date of the event.
      */
     public Event(String description, LocalDate start, LocalDate end) {
         super(description);
@@ -26,7 +26,7 @@ public class Event extends Task {
     /**
      * Returns the start time of the event.
      *
-     * @return The start time string.
+     * @return The start date as a LocalDate object.
      */
     public LocalDate getStart() {
         return this.start;
@@ -35,12 +35,18 @@ public class Event extends Task {
     /**
      * Returns the end time of the event.
      *
-     * @return The end time string.
+     * @return The end date as a LocalDate object.
      */
     public LocalDate getEnd() {
         return this.end;
     }
 
+    /**
+     * Updates the start and end dates of the event.
+     *
+     * @param start The new start date.
+     * @param end   The new end date.
+     */
     public void setStartEnd(LocalDate start, LocalDate end) {
         this.start = start;
         this.end = end;
@@ -48,6 +54,7 @@ public class Event extends Task {
 
     /**
      * Returns a string representation of the event task.
+     * The date is formatted as "MMM dd yyyy" (e.g. Oct 25 2026).
      *
      * @return The formatted string of the event.
      */

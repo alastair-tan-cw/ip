@@ -103,6 +103,12 @@ public class TaskList {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Checks if a given task already exists in the task list to prevent duplicates.
+     *
+     * @param task The task to check for duplication.
+     * @return true if an identical existing task exists, false otherwise.
+     */
     public boolean isDuplicate(Task task) {
         String details = task.toString().substring(7);
 
