@@ -129,7 +129,7 @@ public class Parser {
             }
 
         } catch (PeterException | DateTimeParseException | NumberFormatException | IndexOutOfBoundsException e) {
-            return e.getMessage();
+            return "Error: " + e.getMessage();
         }
     }
 

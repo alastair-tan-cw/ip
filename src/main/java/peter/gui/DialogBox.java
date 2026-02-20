@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 
 public class DialogBox extends HBox {
 
@@ -33,6 +34,9 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+        double radius = displayPicture.getFitWidth() / 2;
+        Circle clip = new Circle(radius, radius, radius);
+        displayPicture.setClip(clip);
     }
 
     /**
@@ -50,9 +54,14 @@ public class DialogBox extends HBox {
         return new DialogBox(text, img);
     }
 
-    public static DialogBox getPeterDialog(String text, Image img) {
+    public static DialogBox getPeterDialog(String text, Image img, boolean isError) {
         var db = new DialogBox(text, img);
         db.flip();
+
+        if (isError) {
+            db.dialog.setStyle("-fx-text-fill: #990000; -fx-font-weight: bold;");
+        }
+
         return db;
     }
 }
