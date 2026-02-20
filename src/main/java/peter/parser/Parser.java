@@ -180,6 +180,9 @@ public class Parser {
             throw new PeterException("Sorry! Description of todo cannot be empty.");
         }
         Task todo = new Todo(args);
+        if (tasks.isDuplicate(todo)) {
+            throw new PeterException("Hold up boss! You already have this todo in your list!");
+        }
         tasks.add(todo);
         storage.saveFile(tasks.getAllTasks());
         return formatString(">> Okay! I've added this todo:", todo.toString(),
@@ -198,6 +201,9 @@ public class Parser {
         try {
             LocalDate date = LocalDate.parse(dSplit[1]);
             Task deadline = new Deadline(dSplit[0], date);
+            if (tasks.isDuplicate(deadline)) {
+                throw new PeterException("Hold up boss! You already have this deadline in your list!");
+            }
             tasks.add(deadline);
             storage.saveFile(tasks.getAllTasks());
             return formatString(">> Time to lock in! I've added this deadline:",
@@ -224,6 +230,9 @@ public class Parser {
         String start = dateArr[0];
         String end = dateArr[1];
         Task event = new Event(description, start, end);
+        if (tasks.isDuplicate(event)) {
+            throw new PeterException("Hold up boss! You already have this event in your list!");
+        }
         tasks.add(event);
         storage.saveFile(tasks.getAllTasks());
         return formatString(">> Okay added! I hope they have snacks there at this event:",
