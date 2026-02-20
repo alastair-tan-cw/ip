@@ -31,7 +31,7 @@ public class MainWindow extends AnchorPane {
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         dialogContainer.getChildren().add(
-                DialogBox.getPeterDialog("Hello! I'm Peter.\nWhat can I do for you?", peterImage)
+                DialogBox.getPeterDialog("Hello! I'm Peter.\nWhat can I do for you?", peterImage, false)
         );
     }
 
@@ -48,10 +48,18 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         String response = peter.getResponse(input);
+
+        boolean isError = false;
+        if (response.startsWith("Error: ")) {
+            isError = true;
+            response = response.replaceFirst("Error: ", "");
+        }
+
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getPeterDialog(response, peterImage)
+                DialogBox.getPeterDialog(response, peterImage, isError)
         );
+
         userInput.clear();
         if (input.equals("bye")) {
             javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(3));
