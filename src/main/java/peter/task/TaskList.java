@@ -102,4 +102,17 @@ public class TaskList {
                 .filter(task -> task.getDescription().contains(input))
                 .collect(Collectors.toList());
     }
+
+    public boolean isDuplicate(Task task) {
+        String details = task.toString().substring(7);
+
+        for (Task t : this.tasks) {
+            String existingDetails = t.toString().substring(7);
+            if (existingDetails.equals(details)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

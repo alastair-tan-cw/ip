@@ -66,8 +66,8 @@ public class Storage {
                     task = new Deadline(description, by);
                     break;
                 case "E":
-                    String start = parts[3];
-                    String end = parts[4];
+                    LocalDate start = LocalDate.parse(parts[3]);
+                    LocalDate end = LocalDate.parse(parts[3]);
                     task = new Event(description, start, end);
                     break;
                 }
