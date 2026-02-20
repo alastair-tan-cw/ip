@@ -31,7 +31,10 @@ public class MainWindow extends AnchorPane {
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         dialogContainer.getChildren().add(
-                DialogBox.getPeterDialog("Hello! I'm Peter.\nWhat can I do for you?", peterImage, false)
+                DialogBox.getPeterDialog("Yo! I'm Peter.\nWhat are we cooking up today\uD83D\uDC68\u200D\uD83C\uDF73?",
+                        peterImage,
+                        false
+                )
         );
     }
 

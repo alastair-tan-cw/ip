@@ -94,7 +94,7 @@ public class Parser {
             String args = splitStr.length > 1 ? splitStr[1] : "";
             switch(splitStr[0]) {
             case "bye":
-                return "Goodbye. Chat again soon?";
+                return "Catch you later, boss! Remember to stay hydrated\uD83E\uDD64!";
 
             case "list":
                 return listTasks(tasks);
@@ -137,18 +137,18 @@ public class Parser {
         try {
             int index = Integer.parseInt(indexStr) - 1;
             if (index < 0 || index >= size) {
-                throw new PeterException("Invalid index. Item does not exist in list.");
+                throw new PeterException("Oops! I tried to fetch that index but I couldn't find it in the list!");
             }
             return index;
 
         } catch (NumberFormatException e) {
-            throw new PeterException("Invalid index format. Please enter a number.");
+            throw new PeterException("Oops! The index you have given is not a number!");
         }
     }
 
     public static String listTasks(TaskList tasks) {
         if (tasks.size() == 0) {
-            return "Nothing in list yet.";
+            return "Nothing in list yet! Let me know if you need to add new tasks!";
         }
         return tasks.getAllTasksAsString();
     }
@@ -157,22 +157,22 @@ public class Parser {
         int index = checkIndex(indexStr, tasks.size());
         tasks.get(index).markAsDone();
         storage.saveFile(tasks.getAllTasks());
-        return formatString("Keep it up! I've marked this task as done:", tasks.get(index).toString());
+        return formatString("LET'S GO! This task is now marked as done:", tasks.get(index).toString());
     }
 
     public static String unmarkTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
         int index = checkIndex(indexStr, tasks.size());
         tasks.get(index).markAsUndone();
         storage.saveFile(tasks.getAllTasks());
-        return formatString("Keep it up! I've unmarked this task:", tasks.get(index).toString());
+        return formatString("No worries! This task has been unmarked:", tasks.get(index).toString());
     }
 
     public static String deleteTask(String indexStr, TaskList tasks, Storage storage) throws PeterException {
         int index = checkIndex(indexStr, tasks.size());
         Task deletedTask = tasks.delete(index);
         storage.saveFile(tasks.getAllTasks());
-        return formatString("Noted. I've removed this task:", deletedTask.toString(),
-                "Now you have " + tasks.size() + " tasks in your list.");
+        return formatString("Sent this task to the Shadow Realm:", deletedTask.toString(),
+                "You're now down to " + tasks.size() + " tasks in your list.");
     }
 
     public static String addTodo(String args, TaskList tasks, Storage storage) throws PeterException {
@@ -182,7 +182,7 @@ public class Parser {
         Task todo = new Todo(args);
         tasks.add(todo);
         storage.saveFile(tasks.getAllTasks());
-        return formatString(">> Got it! I've added this task:", todo.toString(),
+        return formatString(">> Okay! I've added this todo:", todo.toString(),
                 "Now you have " + tasks.size() + " tasks in your list.");
     }
 
@@ -200,7 +200,7 @@ public class Parser {
             Task deadline = new Deadline(dSplit[0], date);
             tasks.add(deadline);
             storage.saveFile(tasks.getAllTasks());
-            return formatString(">> Got it! I've added this task:",
+            return formatString(">> Time to lock in! I've added this deadline:",
                     deadline.toString(),
                     "Now you have " + tasks.size() + " tasks in your list.");
         } catch (DateTimeParseException e) {
@@ -226,7 +226,7 @@ public class Parser {
         Task event = new Event(description, start, end);
         tasks.add(event);
         storage.saveFile(tasks.getAllTasks());
-        return formatString(">> Got it! I've added this task:",
+        return formatString(">> Okay added! I hope they have snacks there at this event:",
                 event.toString(),
                 "Now you have " + tasks.size() + " tasks in your list.");
     }
@@ -239,7 +239,7 @@ public class Parser {
         if (foundTasks.isEmpty()) {
             throw new PeterException("There are no matching tasks in your list.");
         }
-        String taskStr = "Here are the matching tasks in your list:\n";
+        String taskStr = "Found these \"" + args +"\" tasks in your list:\n";
         for (int i = 0; i < foundTasks.size(); i++) {
             taskStr += i + 1 + "." + foundTasks.get(i);
             if (i != foundTasks.size() - 1) {
@@ -288,7 +288,7 @@ public class Parser {
         }
 
         storage.saveFile(tasks.getAllTasks());
-        return formatString("Got it! I've snoozed this task to the new date: ", task.toString());
+        return formatString("Remember to take a break! This task has been snoozed: ", task.toString());
     }
 
     /**
